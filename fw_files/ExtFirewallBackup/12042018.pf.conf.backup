@@ -1,0 +1,64 @@
+#	$OpenBSD: pf.conf,v 1.54 2014/08/23 05:49:42 deraadt Exp $
+#
+# See pf.conf(5) and /etc/examples/pf.conf
+
+set skip on lo
+
+block return	# block stateless traffic
+pass		# establish keep-state
+
+# By default, do not permit remote connections to X11
+block return in on ! lo0 proto tcp to port 6000:6010
+
+# Macros
+int_if = "vlan1112"
+ext_if = "vmx1"
+mail_ext = "10.101.0.10"
+mail_int = "192.168.30.2"
+dns_ext = "10.101.0.5"
+dns_int = "192.168.34.2"
+web_ext = "10.101.0.20"
+web_int = "192.168.43.2"
+web_ext_6 = "fd00:a:6500::3"
+web_int_6 = "fd00:a:6500:1138::2"
+ftp_ext = "10.101.0.40"
+ftp_int = "192.168.32.2"
+web_inj_int = "192.168.89.2"
+web_inj_ext = "10.101.0.62"
+CSAP_server_int = "192.168.91.2"
+CSAP_server_ext = "10.101.0.91"
+
+# macros added by andrew
+honey_if = "vlan1111"
+honey_mitm = 172.16.0.2
+
+# Rules
+pass out on vmx1 inet from 192.168.0.0/16 to any nat-to 10.101.0.2
+pass in log on $ext_if proto tcp to $mail_ext rdr-to $mail_int
+pass in log on $ext_if proto {tcp udp} from any to $dns_ext rdr-to $dns_int
+pass in log on $int_if proto {tcp udp} from any to $dns_ext rdr-to $dns_int
+pass in log on $ext_if proto {tcp udp} to $web_ext rdr-to $web_int 
+pass in log on $ext_if proto tcp to $ftp_ext rdr-to $ftp_int
+pass in log on $ext_if proto tcp to $web_inj_ext rdr-to $web_inj_int
+pass in log on $ext_if proto tcp to $CSAP_server_ext rdr-to $CSAP_server_int
+
+anchor "ftp-proxy/*"
+
+# IPv6
+pass in log on $ext_if inet6 proto tcp to $web_ext_6 rdr-to $web_int_6
+
+pass in log on $ext_if proto tcp from any to 10.101.0.60 rdr-to 192.168.170.2
+
+### added by andrew for honeynet 7 apr
+
+#tag inbound honeynet traffic
+pass in log on $honey_if tag honey
+
+#NAT honeynet traffic going external
+pass out log on $ext_if inet to 10.0.0.0/8 nat-to 10.101.0.2 reply-to ($honey_if $honey_mitm) tagged honey
+pass out log on $ext_if inet proto {tcp udp} to port domain nat-to $dns_ext reply-to ($honey_if $honey_mitm) tagged honey
+
+#NAT honeynet traffic going internal
+pass out log on $int_if inet to 192.168.0.0/16 nat-to 172.16.0.1 reply-to ($honey_if $honey_mitm) tagged honey
+
+

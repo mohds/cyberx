@@ -1,0 +1,2 @@
+vlan 666 vlandev vmx0 
+up

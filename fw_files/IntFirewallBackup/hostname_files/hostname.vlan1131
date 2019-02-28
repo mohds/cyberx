@@ -1,0 +1,2 @@
+inet 192.168.32.1 255.255.255.252 NONE vlan 1131 vlandev vmx0 up
+inet6 fd00:a:6500:1131::1

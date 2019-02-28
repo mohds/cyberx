@@ -1,0 +1,4 @@
+add vlan2102
+addspan vlan777
+addspan vlan999
+up

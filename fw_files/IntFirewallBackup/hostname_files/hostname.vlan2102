@@ -1,0 +1,2 @@
+vlan 2102 vlandev vmx0
+up

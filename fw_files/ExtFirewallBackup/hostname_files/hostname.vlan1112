@@ -1,0 +1,4 @@
+inet 192.168.1.1 255.255.255.252 NONE vlan 1112 vlandev vmx0 up
+!route add -net 192.168.0.0/16 192.168.1.2
+inet6 fd00:a:6500:1112::1
+!route  -n add -inet6 fd00:a:6500::/48 fd00:a:6500:1112::2

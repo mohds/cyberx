@@ -1,0 +1,2 @@
+vlan 777 vlandev vmx0
+up

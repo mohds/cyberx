@@ -1,0 +1,8 @@
+add vether0
+add vlan1190
+add vlan1191
+add vlan1192
+add vlan1193
+addspan vlan666
+addspan vlan999
+up

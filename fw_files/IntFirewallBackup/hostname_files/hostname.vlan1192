@@ -1,0 +1,1 @@
+vlan 1192 vlandev vmx0 up 
